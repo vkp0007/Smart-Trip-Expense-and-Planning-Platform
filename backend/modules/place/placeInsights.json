@@ -1,0 +1,47 @@
+{
+  "Goa": {
+    "popularAttractions": [
+      "Baga Beach",
+      "Fort Aguada",
+      "Dudhsagar Falls"
+    ],
+
+    "warnings": [
+      "Heavy rainfall during monsoon season",
+      "Water sports may be unavailable during storms"
+    ],
+
+    "seasonalNotes":
+      "Best time to visit is November to February."
+  },
+
+  "Manali": {
+    "popularAttractions": [
+      "Solang Valley",
+      "Rohtang Pass",
+      "Hadimba Temple"
+    ],
+
+    "warnings": [
+      "Road closures possible during snowfall"
+    ],
+
+    "seasonalNotes":
+      "Winter months are ideal for snow activities."
+  },
+
+  "Delhi": {
+    "popularAttractions": [
+      "India Gate",
+      "Red Fort",
+      "Qutub Minar"
+    ],
+
+    "warnings": [
+      "High traffic congestion during peak hours"
+    ],
+
+    "seasonalNotes":
+      "October to March offers pleasant weather."
+  }
+}
