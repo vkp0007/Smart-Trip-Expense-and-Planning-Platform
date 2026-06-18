@@ -1,24 +1,54 @@
-import express from "express";
+import express
+from "express";
 
 import {
 
-    getPlaceInsights,
+  getPlaceInsights,
 
-    generateTravelAdvice
+  generateTravelAdvice,
+
+  getAllDestinations,
+
+  getRegions,
+
+  getDestinationsByRegion,
+
+  searchDestinations
 
 }
 from "./place.controller.js";
 
-const router = express.Router();
+const router =
+  express.Router();
 
 router.get(
-    "/:destination",
-    getPlaceInsights
+  "/destinations",
+  getAllDestinations
+);
+
+router.get(
+  "/regions",
+  getRegions
+);
+
+router.get(
+  "/region/:region",
+  getDestinationsByRegion
+);
+
+router.get(
+  "/search/:keyword",
+  searchDestinations
+);
+
+router.get(
+  "/insights/:destination",
+  getPlaceInsights
 );
 
 router.post(
-    "/travel-advice",
-    generateTravelAdvice
+  "/travel-advice",
+  generateTravelAdvice
 );
 
 export default router;

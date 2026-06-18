@@ -82,12 +82,9 @@ const getUserProfile = async (
 
     try {
 
-        const { userId } =
-            req.params;
-
         const user =
             await getUserProfileService(
-                userId
+                req.user._id
             );
 
         return res.status(200).json({

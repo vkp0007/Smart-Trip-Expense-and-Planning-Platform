@@ -144,6 +144,118 @@ const createExpense = async ({
     };
 };
 
+const getExpensesByTrip =
+  async (tripId) => {
+
+    const expenses =
+      await Expense.find({
+        tripId,
+      })
+        .populate(
+          "payerId",
+          "name email"
+        )
+        .sort({
+          createdAt: -1,
+        });
+
+    return expenses;
+};
+
+const getTripAnalytics =
+  async (tripId) => {
+
+    const trip =
+      await Trip.findById(
+        tripId
+      );
+
+    if (!trip) {
+
+      throw new Error(
+        "Trip not found"
+      );
+    }
+
+    const expenses =
+      await Expense.find({
+        tripId,
+      });
+
+    const totalExpenses =
+      expenses.reduce(
+        (sum, expense) =>
+          sum +
+          expense.convertedAmount,
+        0
+      );
+
+    const categoryMap =
+      {};
+
+    expenses.forEach(
+      (expense) => {
+
+        if (
+          !categoryMap[
+            expense.category
+          ]
+        ) {
+
+          categoryMap[
+            expense.category
+          ] = 0;
+        }
+
+        categoryMap[
+          expense.category
+        ] +=
+          expense.convertedAmount;
+      }
+    );
+
+    const categories =
+      Object.entries(
+        categoryMap
+      ).map(
+        ([
+          category,
+          amount,
+        ]) => ({
+
+          category,
+
+          amount,
+        })
+      );
+
+    return {
+
+      totalExpenses,
+
+      totalBudget:
+        trip.totalBudget,
+
+      remainingBudget:
+        trip.totalBudget -
+        totalExpenses,
+
+      budgetUsedPercentage:
+        trip.totalBudget > 0
+          ? Math.round(
+              (
+                totalExpenses /
+                trip.totalBudget
+              ) * 100
+            )
+          : 0,
+
+      categories,
+    };
+};
+
 export {
-    createExpense
+    createExpense, 
+    getExpensesByTrip,
+    getTripAnalytics
 };

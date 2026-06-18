@@ -8,7 +8,9 @@ import {
 
     addParticipant,
 
-    completeTrip
+    completeTrip,
+
+    getMyTrips,
 
 }
 from "./trip.controller.js";
@@ -19,6 +21,12 @@ router.post(
     "/",
     createTrip
 );
+
+router.get(
+    "/",
+    getMyTrips
+);
+
 
 router.get(
     "/:tripId",

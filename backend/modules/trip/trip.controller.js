@@ -6,7 +6,9 @@ import {
 
     addParticipant as addParticipantService,
 
-    completeTrip as completeTripService
+    completeTrip as completeTripService,
+
+    getMyTrips as getMyTripsService,
 
 }
 from "./tripService.js";
@@ -78,36 +80,35 @@ const getTripById = async (
 };
 
 const addParticipant = async (
-    req,
-    res
+  req,
+  res
 ) => {
 
-    try {
+  try {
 
-        const trip =
-            await addParticipantService(
-                req.body
-            );
+   
 
-        return res.status(200).json({
+    const trip =
+      await addParticipantService(
+        req.body
+      );
 
-            success: true,
+    return res.status(200).json({
+      success: true,
+      message:
+        "Participant added successfully",
+      data: trip,
+    });
 
-            message:
-                "Participant added successfully",
+  } catch (error) {
 
-            data: trip
-        });
+   
 
-    } catch (error) {
-
-        return res.status(500).json({
-
-            success: false,
-
-            message: error.message
-        });
-    }
+    return res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
 };
 
 const completeTrip = async (
@@ -142,6 +143,40 @@ const completeTrip = async (
     }
 };
 
+const getMyTrips = async (
+    req,
+    res
+) => {
+
+    try {
+
+        const { userId } =
+            req.query;
+
+        const trips =
+            await getMyTripsService(
+                userId
+            );
+
+        return res.status(200).json({
+
+            success: true,
+
+            data: trips
+        });
+
+    } catch (error) {
+
+        return res.status(500).json({
+
+            success: false,
+
+            message:
+                error.message
+        });
+    }
+};
+
 export {
 
     createTrip,
@@ -150,5 +185,7 @@ export {
 
     addParticipant,
 
-    completeTrip
+    completeTrip,
+
+    getMyTrips
 };

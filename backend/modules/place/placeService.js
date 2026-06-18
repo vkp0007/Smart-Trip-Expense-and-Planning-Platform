@@ -1,73 +1,129 @@
-import placeInsights from "./placeInsights.json" with { type: "json" };
+import places
+from "../place/data/indiaDestinations.json"
+with { type: "json" };
 
-const getPlaceInsights = async (destination) => {
+const getPlaceInsights =
+  async (destination) => {
 
-    const insights = placeInsights[destination];
+    const place =
+      places.find(
+        (item) =>
+          item.name
+            .toLowerCase() ===
+          destination
+            .toLowerCase()
+      );
 
-    if (!insights) {
-        throw new Error("Place insights not found");
+    if (!place) {
+
+      throw new Error(
+        "Destination not found"
+      );
     }
 
-    return insights;
+    return place;
 };
 
-const generateTravelAdvice = async ({
+const generateTravelAdvice =
+  async ({
     destination,
     startDate,
     endDate
-}) => {
+  }) => {
 
-    const insights = placeInsights[destination];
-
-    if (!insights) {
-        throw new Error("Place insights not found");
-    }
-
-    const startMonth =
-        new Date(startDate).getMonth() + 1;
-
-    let seasonalAdvice =
-        insights.seasonalNotes;
-
-    if (
-        destination === "Goa" &&
-        [6, 7, 8].includes(startMonth)
-    ) {
-
-        seasonalAdvice =
-            "Monsoon season expected. Outdoor activities may face disruptions.";
-    }
-
-    if (
-        destination === "Manali" &&
-        [12, 1, 2].includes(startMonth)
-    ) {
-
-        seasonalAdvice =
-            "Heavy snowfall possible. Carry winter clothing and check road conditions.";
-    }
+    const place =
+      await getPlaceInsights(
+        destination
+      );
 
     return {
 
-        destination,
+      destination:
+        place.name,
 
-        travelWindow: {
-            startDate,
-            endDate
-        },
+      state:
+        place.state,
 
-        attractions:
-            insights.popularAttractions,
+      region:
+        place.region,
 
-        warnings:
-            insights.warnings,
+      travelWindow: {
+        startDate,
+        endDate
+      },
 
-        travelAdvice:
-            seasonalAdvice
+      attractions:
+        place.popularAttractions,
+
+      recommendations: [
+
+        `Visit ${place.popularAttractions[0]}`,
+
+        `Explore attractions across ${place.state}`,
+
+        `Discover the beauty of ${place.region}`,
+
+        "Book accommodations early",
+
+        "Plan local transportation in advance"
+      ]
     };
 };
 
+const getAllDestinations =
+  async () => {
+
+    return places;
+};
+
+const getRegions =
+  async () => {
+
+    return [
+      ...new Set(
+        places.map(
+          (place) =>
+            place.region
+        )
+      )
+    ];
+};
+
+const getDestinationsByRegion =
+  async (region) => {
+
+    return places.filter(
+      (place) =>
+        place.region
+          .toLowerCase() ===
+        region.toLowerCase()
+    );
+};
+
+const searchDestinations =
+  async (keyword) => {
+
+    return places.filter(
+      (place) =>
+        place.name
+          .toLowerCase()
+          .includes(
+            keyword.toLowerCase()
+          )
+    );
+};
+
 export {
-    getPlaceInsights,
-    generateTravelAdvice
+
+  getPlaceInsights,
+
+  generateTravelAdvice,
+
+  getAllDestinations,
+
+  getRegions,
+
+  getDestinationsByRegion,
+
+  searchDestinations
 };

@@ -11,7 +11,13 @@ import {
 }
 from "./user.controller.js";
 
-const router = express.Router();
+import {
+    protect
+}
+from "./auth.middleware.js";
+
+const router =
+    express.Router();
 
 router.post(
     "/register",
@@ -24,7 +30,8 @@ router.post(
 );
 
 router.get(
-    "/:userId",
+    "/profile",
+    protect,
     getUserProfile
 );
 

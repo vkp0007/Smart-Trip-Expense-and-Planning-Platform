@@ -1,128 +1,79 @@
 import express from "express";
 import dotenv from "dotenv";
-const PORT = process.env.PORT || 5000;
+import cors from "cors";
 
 import {
-    databaseConnection as connectDB
+  databaseConnection as connectDB,
 } from "./config/databaseConnection.js";
 
-import tripRoutes
-from "./modules/trip/trip.routes.js";
+import tripRoutes from "./modules/trip/trip.routes.js";
+import expenseRoutes from "./modules/expense/expense.routes.js";
+import settlementRoutes from "./modules/settlement/settlement.routes.js";
+import budgetRoutes from "./modules/budget/budget.routes.js";
+import loyaltyRoutes from "./modules/loyalty/loyalty.routes.js";
+import aiRoutes from "./modules/ai/ai.routes.js";
+import supportRoutes from "./modules/support/support.routes.js";
+import vendorRoutes from "./modules/vendor/vendor.routes.js";
+import placeRoutes from "./modules/place/place.routes.js";
+import userRoutes from "./modules/user/user.routes.js";
 
-import expenseRoutes
-from "./modules/expense/expense.routes.js";
+/* -------------------- ENV -------------------- */
 
-import settlementRoutes
-from "./modules/settlement/settlement.routes.js";
+dotenv.config();
 
-import budgetRoutes
-from "./modules/budget/budget.routes.js";
+const PORT = process.env.PORT || 5000;
 
-import loyaltyRoutes
-from "./modules/loyalty/loyalty.routes.js";
-
-import aiRoutes
-from "./modules/ai/ai.routes.js";
-
-import supportRoutes
-from "./modules/support/support.routes.js";
-
-import vendorRoutes
-from "./modules/vendor/vendor.routes.js";
-
-import placeRoutes
-from "./modules/place/place.routes.js";
-
-import userRoutes
-from "./modules/user/user.routes.js";
-
-
-
-// LOAD ENV VARIABLES
-
-dotenv.config({
-    path: ".env"
-});
+/* -------------------- APP -------------------- */
 
 const app = express();
 
-
-// DATABASE CONNECTION
+/* -------------------- DATABASE -------------------- */
 
 connectDB();
 
+/* -------------------- MIDDLEWARES -------------------- */
 
-// MIDDLEWARES
+app.use(
+  cors({
+    origin: "http://localhost:5173",
+    credentials: true,
+  })
+);
 
 app.use(express.json());
 
+/* -------------------- ROUTES -------------------- */
 
-// ROUTES
-app.use(
-    "/api/users",
-    userRoutes
-);
+app.use("/api/users", userRoutes);
 
-app.use(
-    "/api/trips",
-    tripRoutes
-);
+app.use("/api/trips", tripRoutes);
 
-app.use(
-    "/api/expenses",
-    expenseRoutes
-);
+app.use("/api/expenses", expenseRoutes);
 
-app.use(
-    "/api/settlements",
-    settlementRoutes
-);
+app.use("/api/settlements", settlementRoutes);
 
-app.use(
-    "/api/budget",
-    budgetRoutes
-);
+app.use("/api/budget", budgetRoutes);
 
-app.use(
-    "/api/loyalty",
-    loyaltyRoutes
-);
+app.use("/api/loyalty", loyaltyRoutes);
 
+app.use("/api/ai", aiRoutes);
 
-app.use(
-    "/api/ai",
-    aiRoutes
-);
+app.use("/api/support", supportRoutes);
 
-app.use(
-    "/api/support",
-    supportRoutes
-);
+app.use("/api/vendors", vendorRoutes);
 
-app.use(
-    "/api/vendors",
-    vendorRoutes
-);
+app.use("/api/places", placeRoutes);
 
-app.use(
-    "/api/places",
-    placeRoutes
-);
-// HEALTH CHECK
+/* -------------------- HEALTH CHECK -------------------- */
 
 app.get("/", (req, res) => {
-    res.send("API Running");
+  res.send("API Running");
 });
 
-
-
-// SERVER
-
-
+/* -------------------- SERVER -------------------- */
 
 app.listen(PORT, () => {
-
-    console.log(
-        `Server running on port ${PORT}`
-    );
+  console.log(
+    `Server running on port ${PORT}`
+  );
 });

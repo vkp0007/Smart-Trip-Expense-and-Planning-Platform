@@ -1,5 +1,7 @@
 import { User }
 from "./user.model.js";
+import { generateToken }
+from "../../config/generateToken.js";
 
 const registerUser = async ({
     name,
@@ -38,18 +40,24 @@ const registerUser = async ({
         });
 
     return {
-        _id: user._id,
 
-        name: user.name,
+    _id: user._id,
 
-        email: user.email,
+    name: user.name,
 
-        preferredCurrency:
-            user.preferredCurrency,
+    email: user.email,
 
-        loyalty:
-            user.loyalty
-    };
+    preferredCurrency:
+        user.preferredCurrency,
+
+    loyalty:
+        user.loyalty,
+
+    token:
+        generateToken(
+            user._id
+        )
+};
 };
 
 const loginUser = async ({
@@ -89,18 +97,23 @@ const loginUser = async ({
 
     return {
 
-        _id: user._id,
+    _id: user._id,
 
-        name: user.name,
+    name: user.name,
 
-        email: user.email,
+    email: user.email,
 
-        preferredCurrency:
-            user.preferredCurrency,
+    preferredCurrency:
+        user.preferredCurrency,
 
-        loyalty:
-            user.loyalty
-    };
+    loyalty:
+        user.loyalty,
+
+    token:
+        generateToken(
+            user._id
+        )
+};
 };
 
 const getUserProfile = async (

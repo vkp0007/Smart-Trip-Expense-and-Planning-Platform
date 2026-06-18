@@ -2,6 +2,8 @@ import { Expense } from "../../modules/expense/expense.model.js";
 import { ExpenseSplit } from "../../modules/expense/expenseSplit.model.js";
 import { Settlement } from "./settlement.model.js";
 import { Trip } from "../../modules/trip/trip.model.js";
+import { User }
+from "../user/user.model.js";
 
 import {
     calculateBalances
@@ -11,66 +13,169 @@ import {
     optimizeSettlements
 } from "./utils/settlementOptimizer.js";
 
-const getTripBalances = async (tripId) => {
+const getTripBalances = async (
+  tripId
+) => {
 
-    // STEP 1:
-    // Validate trip exists
+  // STEP 1:
+  // Validate trip
 
-    const trip = await Trip.findById(tripId);
+  const trip =
+    await Trip.findById(
+      tripId
+    );
 
-    if (!trip) {
-        throw new Error("Trip not found");
+  if (!trip) {
+
+    throw new Error(
+      "Trip not found"
+    );
+  }
+
+  // STEP 2:
+  // Fetch expenses
+
+  const expenses =
+    await Expense.find({
+      tripId,
+    });
+
+  const expenseIds =
+    expenses.map(
+      (expense) =>
+        expense._id
+    );
+
+  const expenseSplits =
+    await ExpenseSplit.find({
+      expenseId: {
+        $in: expenseIds,
+      },
+    });
+
+  const settlements =
+    await Settlement.find({
+      tripId,
+    });
+
+  // STEP 3:
+  // Calculate balances
+
+  const balances =
+    calculateBalances({
+      expenses,
+      expenseSplits,
+      settlements,
+    });
+
+  // STEP 4:
+  // Suggested settlements
+
+  const suggestedSettlements =
+    optimizeSettlements(
+      balances
+    );
+
+  // STEP 5:
+  // Fetch users
+
+  const userIds =
+    Object.keys(
+      balances
+    );
+
+  const users =
+    await User.find({
+      _id: {
+        $in: userIds,
+      },
+    });
+
+  const userMap = {};
+
+  users.forEach(
+    (user) => {
+
+      userMap[
+        user._id.toString()
+      ] = user;
     }
+  );
 
-    // STEP 2:
-    // Fetch financial records
+  // STEP 6:
+  // Format balances
 
-    const expenses =
-        await Expense.find({ tripId });
+  const formattedBalances =
+    users.map(
+      (user) => ({
 
-    const expenseIds =
-        expenses.map(
-            (expense) => expense._id
-        );
+        userId:
+          user._id,
 
-    const expenseSplits =
-        await ExpenseSplit.find({
-            expenseId: {
-                $in: expenseIds
-            }
-        });
+        name:
+          user.name,
 
-    const settlements =
-        await Settlement.find({
-            tripId
-        });
+        email:
+          user.email,
 
-    // STEP 3:
-    // Compute balances
+        balance:
+          balances[
+            user._id.toString()
+          ] || 0,
+      })
+    );
 
-    const balances =
-        calculateBalances({
-            expenses,
-            expenseSplits,
-            settlements
-        });
+  // STEP 7:
+  // Format settlements
 
-    // STEP 4:
-    // Generate settlement suggestions
+  const formattedSettlements =
+    suggestedSettlements.map(
+      (
+        settlement
+      ) => ({
 
-    const suggestedSettlements =
-        optimizeSettlements(
-            balances
-        );
+        fromUserId:
+          settlement.fromUserId,
 
-    // STEP 5:
-    // Return result
+        fromName:
+          userMap[
+            settlement.fromUserId
+          ]?.name,
 
-    return {
-        balances,
-        suggestedSettlements
-    };
-};
+        toUserId:
+          settlement.toUserId,
+
+        toName:
+          userMap[
+            settlement.toUserId
+          ]?.name,
+
+        amount:
+          settlement.amount,
+      })
+    );
+
+  // STEP 8:
+  // Trip fully settled?
+
+  const isSettled =
+    formattedSettlements.length ===
+    0;
+
+  // STEP 9:
+  // Return response
+
+  return {
+
+    balances:
+      formattedBalances,
+
+    suggestedSettlements:
+      formattedSettlements,
+
+    isSettled,
+  };
+};;
 
 const createSettlement = async ({
     tripId,

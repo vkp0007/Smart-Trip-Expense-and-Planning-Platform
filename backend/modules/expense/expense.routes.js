@@ -1,14 +1,27 @@
 import express from "express";
 
 import {
-    createExpense
-} from "../expense/expense.controller.js";
+  createExpense,
+  getExpensesByTrip,
+  getTripAnalytics,
+}
+from "../expense/expense.controller.js";
 
 const router = express.Router();
 
 router.post(
-    "/",
-    createExpense
+  "/",
+  createExpense
+);
+
+router.get(
+  "/trip/:tripId",
+  getExpensesByTrip
+);
+
+router.get(
+  "/trip/:tripId/analytics",
+  getTripAnalytics
 );
 
 export default router;

@@ -1,5 +1,6 @@
 import { Trip }
 from "./trip.model.js";
+import {User} from "../user/user.model.js";
 
 import {
     updateUserLoyaltyAfterTrip
@@ -82,7 +83,7 @@ const getTripById = async (
 
 const addParticipant = async ({
     tripId,
-    userId
+    email
 }) => {
 
     const trip =
@@ -95,13 +96,25 @@ const addParticipant = async ({
         );
     }
 
+    const user =
+        await User.findOne({
+            email
+        });
+
+    if (!user) {
+
+        throw new Error(
+            "User not found"
+        );
+    }
+
     // Prevent duplicates
 
     const alreadyParticipant =
         trip.participants.some(
             (participant) =>
                 participant.user.toString() ===
-                userId.toString()
+                user._id.toString()
         );
 
     if (alreadyParticipant) {
@@ -113,14 +126,18 @@ const addParticipant = async ({
 
     trip.participants.push({
 
-        user: userId,
+        user: user._id,
 
         role: "member"
     });
 
     await trip.save();
 
-    return trip;
+    return await Trip.findById(tripId)
+        .populate(
+            "participants.user",
+            "name email"
+        );
 };
 
 const completeTrip = async (tripId) => {
@@ -191,6 +208,35 @@ const completeTrip = async (tripId) => {
     };
 };
 
+const getMyTrips = async (
+    userId
+) => {
+
+    const trips =
+        await Trip.find({
+            $or: [
+                {
+                    createdBy: userId
+                },
+                {
+                    "participants.user":
+                        userId
+                }
+            ]
+        })
+            .populate(
+                "createdBy",
+                "name email"
+            )
+            .sort({
+                createdAt: -1
+            });
+
+    return trips;
+};
+
+
+
 export {
 
     createTrip,
@@ -199,5 +245,7 @@ export {
 
     addParticipant,
 
-    completeTrip
+    completeTrip,
+
+    getMyTrips
 };
