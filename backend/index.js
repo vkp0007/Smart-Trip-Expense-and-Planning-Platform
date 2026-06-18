@@ -35,7 +35,7 @@ connectDB();
 
 app.use(
   cors({
-    origin: "http://localhost:5173",
+    origin: "https://travel-split-xi.vercel.app",
     credentials: true,
   })
 );
@@ -70,10 +70,4 @@ app.get("/", (req, res) => {
   res.send("API Running");
 });
 
-/* -------------------- SERVER -------------------- */
-
-app.listen(PORT, () => {
-  console.log(
-    `Server running on port ${PORT}`
-  );
-});
+export default app;
